@@ -10,8 +10,11 @@ form {
     position: relative;
 }
 
+.inputLabel {
+    margin: 10px 30px 10px 20px;
+}
 form label {
-    margin: 20px;
+    margin-right: 15px;
 }
 
 form button {
@@ -42,14 +45,14 @@ form button {
     border-radius: 20px;
 }
 
-#confirmFormBtn {
+.confirmFormBtn {
     margin: 10px;
     position: absolute;
     right: 10px;
     bottom: 0px;
 }
 
-#editFormBtn {
+.editFormBtn {
     margin: 10px;
     position: absolute;
     left: 10px;

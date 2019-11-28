@@ -8,11 +8,14 @@ export default class Form extends React.Component {
     initialState = {
         initialYear: (new Date()).getFullYear(),
         name: '',
-        year: (new Date()).getFullYear(),
-        month: 'January',
-        day:'1',
-        country: 'Afghanistan',
-        dietary: 'Omnivore',
+        year: '',
+        month: '',
+        day:'',
+        country: '',
+        dietary: '',
+        selectedOmnivore: false,
+        selectedVegetarian: false,
+        selectedVegan: false,
         motivation: '',
         attemptToSubmit: false,
         formSubmitted: false,
@@ -31,35 +34,47 @@ export default class Form extends React.Component {
     }
 
     handleDOBYearInput = event => {
-        this.setState({year: event.target.value})
+        this.setState({year: event.target.value, missingField:false})
         if (this.state.formSubmitted) {
             this.setState({formSubmitted: false})
         }
     }
 
     handleDOBMonthInput = event => {
-        this.setState({month: event.target.value})
+        this.setState({month: event.target.value, missingField:false})
         if (this.state.formSubmitted) {
             this.setState({formSubmitted: false})
         }
     }
 
     handleDOBDayInput = event => {
-        this.setState({day: event.target.value})
+        this.setState({day: event.target.value, missingField:false})
         if (this.state.formSubmitted) {
             this.setState({formSubmitted: false})
         }
     }
 
     handleCountryInput = event => {
-        this.setState({country: event.target.value})
+        this.setState({country: event.target.value, missingField:false})
         if (this.state.formSubmitted) {
             this.setState({formSubmitted: false})
         }
     }
 
     handleDietInput = event => {
-        this.setState({dietary: event.target.value})
+        switch (event.target.value) {
+            case 'Omnivore':
+                this.setState({selectedOmnivore: true, selectedVegetarian: false, selectedVegan: false})
+                break;
+            case 'Vegetarian':
+                this.setState({selectedOmnivore: false, selectedVegetarian: true, selectedVegan: false})
+                break;
+            case 'Vegan':
+                this.setState({selectedOmnivore: false, selectedVegetarian: false, selectedVegan: true})
+                break;
+            default: break;
+        }
+        this.setState({dietary: event.target.value, missingField:false})
         if (this.state.formSubmitted) {
             this.setState({formSubmitted: false})
         }
@@ -74,11 +89,17 @@ export default class Form extends React.Component {
 
     handleSubmitForm = event => {
         event.preventDefault();
-        if (this.state.name && this.state.motivation) {
-            this.setState({attemptToSubmit: true})
+        if (this.state.name && this.state.motivation && this.state.dietary
+            && this.state.year && this.state.month && this.state.day && this.state.country) {
+            this.setState({attemptToSubmit: true, missingField:false})
         } else {
             this.setState({missingField: true})
         }
+    }
+
+    handleResetForm = event => {
+        event.preventDefault();
+        this.setState(this.initialState)
     }
 
     handleConfirmBtn = () => {
@@ -93,7 +114,8 @@ export default class Form extends React.Component {
     // ####################### RENDER ##############################
     render() {
         const dobYear = (
-            <select value={this.state.year} onChange={this.handleDOBYearInput}>
+            <select id='selectYear' value={this.state.year} onChange={this.handleDOBYearInput}>
+                <option value=''>Select A Year</option>
                 {new Array(100).fill(this.state.initialYear).map((year, index) => {
                     return <option value={year-index} key={year-index}>{year-index}</option>
                 })}
@@ -102,6 +124,7 @@ export default class Form extends React.Component {
 
         const dobMonth = (
             <select value={this.state.month} onChange={this.handleDOBMonthInput} >
+                <option value=''>Select A Month</option>
                 <option value='January'>January</option>
                 <option value='February'>February</option>
                 <option value='March'>March</option>
@@ -119,6 +142,7 @@ export default class Form extends React.Component {
 
         const dobDay = (
             <select value={this.state.day} onChange={this.handleDOBDayInput}>
+                <option value=''>Select A Day</option>
                 {new Array(31).fill(1).map((day, index) => {
                     let dayNum;
 
@@ -149,7 +173,8 @@ export default class Form extends React.Component {
         )
 
         const originCountry = (
-            <select value={this.state.country} onChange={this.handleCountryInput}>
+            <select id='selectCountry' value={this.state.country} onChange={this.handleCountryInput}>
+                <option value=''>Select A Country</option>
                 {countriesList.map(country => <option value={country.name} key={country.code}>{country.name}</option>)}
             </select>
         )
@@ -164,8 +189,8 @@ export default class Form extends React.Component {
                     <p>Dietary: {this.state.dietary}</p>
                     <p>Motivation to join the Mars Mission: {this.state.motivation}</p>
                     <h3 id='confirmationQuestion'>Are you sure all the information are correct?</h3>
-                    <button id='confirmFormBtn' onClick={this.handleConfirmBtn}>Confirm</button>
-                    <button id='editFormBtn' onClick={this.handleEditFormBtn}>Edit Form</button>
+                    <button className='editFormBtn' onClick={this.handleEditFormBtn}>Edit Form</button>
+                    <button className='confirmFormBtn' onClick={this.handleConfirmBtn}>Confirm</button>
                 </div>
             )
         }
@@ -184,48 +209,41 @@ export default class Form extends React.Component {
             <>
                 {submitConfirmationText}
                 <form onSubmit={this.handleSubmitForm}>
-                    <label>
-                        What's your name?
-                        <span>
-                            <input type='text' value={this.state.name} onChange={this.handleUserFullNameInput} />
+                    <label className='inputLabel' htmlFor='nameInput'>What's your name?</label>
+                    <input id='nameInput' type='text' value={this.state.name} onChange={this.handleUserFullNameInput} />
+                    <br/>
+
+                    <label className='inputLabel' htmlFor='selectYear'>What is your date of birth?</label>
+                    {dobYear}
+                    {dobMonth}
+                    {dobDay}
+                    <br/>
+
+                    <label className='inputLabel' htmlFor='selectCountry'>What is your country of origin?</label>
+                    {originCountry}
+                    <br/>
+
+                    <label className='inputLabel'>What is your dietary preference?</label>
+                        <span id='dietaryOptions'>
+                            <input id='omnivoreRadio' type='radio' name='selectDietRadio' value='Omnivore' 
+                                    checked={this.state.selectedOmnivore} onChange={this.handleDietInput}/> 
+                            <label htmlFor='omnivoreRadio'>Omnivore</label>
+                            <input id='vegetarianRadio' type='radio' name='selectDietRadio' value='Vegetarian' 
+                                    checked={this.state.selectedVegetarian} onChange={this.handleDietInput}/> 
+                            <label htmlFor='vegetarianRadio'>Vegetarian</label>
+                            <input id='veganRadio' type='radio' name='selectDietRadio' value='Vegan' 
+                                    checked={this.state.selectedVegan} onChange={this.handleDietInput}/> 
+                            <label htmlFor='veganRadio'>Vegan</label>
                         </span>
-                    </label>
                     <br/>
 
-                    <label>
-                        What is your date of birth?
-                        <span>
-                            {dobYear}
-                            {dobMonth}
-                            {dobDay}
-                        </span>
-                    </label>
-                    <br/>
-
-                    <label>
-                        What is your country of origin?
-                        {originCountry}
-                    </label>
-                    <br/>
-
-                    <label>
-                        What is your dietary preference?
-                        <select value={this.state.dietary} onChange={this.handleDietInput}>
-                            <option value='Omnivore'>Omnivore</option>
-                            <option value='Vegetarian'>Vegetarian</option>
-                            <option value='Vegan'>Vegan</option>
-                        </select>
-                    </label>
-                    <br/>
-
-                    <label>
-                        Why do you want to be a Mars explorer? 
-                        <textarea id='motivationTextArea' value={this.state.motivation} onChange={this.handleMotivationInput} 
-                                rows="10"></textarea>
-                    </label>
+                    <label className='inputLabel' htmlFor='motivationTextArea'>Why do you want to be a Mars explorer?</label>
+                    <textarea id='motivationTextArea' value={this.state.motivation} onChange={this.handleMotivationInput} 
+                            rows="10"></textarea>
                     <br/>
                     {errorMessage}
-                    <button>Submit</button>{/* <button onChange={this.handleSubmitButton}>Submit</button> */}
+                    <button className='editFormBtn' onClick={this.handleResetForm}>Rest inputs</button>
+                    <button className='confirmFormBtn'>Submit</button>
                 </form>
 
                 {confirmationRequest}
