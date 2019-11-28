@@ -163,7 +163,7 @@ export default class Form extends React.Component {
                     <p>Country of Origin: {this.state.country}</p>
                     <p>Dietary: {this.state.dietary}</p>
                     <p>Motivation to join the Mars Mission: {this.state.motivation}</p>
-                    <h3>Are you sure all the information are correct?</h3>
+                    <h3 id='confirmationQuestion'>Are you sure all the information are correct?</h3>
                     <button id='confirmFormBtn' onClick={this.handleConfirmBtn}>Confirm</button>
                     <button id='editFormBtn' onClick={this.handleEditFormBtn}>Edit Form</button>
                 </div>
@@ -225,8 +225,7 @@ export default class Form extends React.Component {
                     </label>
                     <br/>
                     {errorMessage}
-                    <button>Submit</button>
-                    {/* <button onChange={this.handleSubmitButton}>Submit</button> */}
+                    <button>Submit</button>{/* <button onChange={this.handleSubmitButton}>Submit</button> */}
                 </form>
 
                 {confirmationRequest}
